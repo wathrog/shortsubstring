@@ -1,9 +1,8 @@
 package org.francesco.shortsubstring;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import com.google.common.base.Preconditions;
+import com.google.common.collect.HashMultiset;
+import com.google.common.collect.Multiset;
 
 /**
  * Class to solve the following problem:
@@ -37,39 +36,60 @@ public class ShortestSubstring {
 		if (numCharacters == 0) {
 			return "";
 		}
-		//Pre-calculate string lenght
-		int sLength = s.length();
+		//Pre-calculate string lengths
+		int inputLength = s.length();
+		
 		//Define the window pointers
-		int start = 0;
+		int begin = 0;
 		int end = 0;
 		//Initialize counter for constraint
 		int targetCount = 0;
-		//Data structures to hold the target state and the current state (occurencies of the target characters in the window)
-		Map<Character, Integer> target = new HashMap<Character, Integer>();
-		Map<Character, Integer> state = new HashMap<Character, Integer>();
-		//Initialize the data structures
-		for (Character c : s.toCharArray()) {
-			Integer charcount = target.get(c);
-			if (charcount == null) {
-				target.put(c, 0);
-				state.put(c, 0);
-			} else {
-				target.put(c, charcount++);
+		//Data structures to hold the target and current state
+		Multiset<Character> target = HashMultiset.create();
+		Multiset<Character> state = HashMultiset.create();
+		//Initialization of the target multiset
+		for (Character c : characters) {
+			target.add(c);
+		}
+		//Initialization of the result variables
+		int substringLength = Integer.MAX_VALUE;
+		int substringStart = 0;
+		int substringEnd = 0;
+		//Execution of the algorithm
+		Character currentChar = null;
+		Character beginChar = null;
+		for (; end < inputLength; end++) {
+			currentChar = s.charAt(end);
+			if (target.contains(currentChar)) {
+				state.add(currentChar);
+				if (state.count(currentChar) <= target.count(currentChar)) {
+					targetCount++;
+				}
+				if (targetCount == numCharacters) {
+					beginChar = s.charAt(begin);
+					while (!target.contains(beginChar) || state.count(beginChar) > target.count(beginChar)) {
+						if (state.count(beginChar) > target.count(beginChar)) {
+							state.remove(beginChar);
+						}
+						beginChar = s.charAt(++begin);
+					}
+					
+					int newLength = end - begin + 1;
+					if (newLength < substringLength) {
+						substringStart = begin;
+						substringEnd = end;
+						substringLength = newLength;
+					}
+				}
 			}
 		}
-		//Run the algorithm
-		for (; end < sLength; end++) {
-			Character currentChar = s.charAt(end);
-			int currentCount = target.get(currentChar);
-			if (target.containsKey(currentChar)) {
-				
-			}
-			
+		
+		
+		if (targetCount == numCharacters) {
+			return s.substring(substringStart, substringEnd+1);
+		} else {
+			return "";
 		}
-		
-		
-		
-		return "null";
 	}
 
 }
