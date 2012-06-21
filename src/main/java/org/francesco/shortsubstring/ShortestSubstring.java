@@ -24,17 +24,30 @@ import com.google.common.collect.Multiset;
  */
 public class ShortestSubstring {
 
+    /**
+     * Static method to solve the given problem and obtain the length of the
+     * shortest substring</br>
+     * 
+     * @param s
+     *            the string to analyse
+     * @param characters
+     *            the sequence of characters
+     * @return the length of the shortest substring if exists, zero otherwise
+     */
     public static int getShortestSubstringLenght(String s, Character... characters) {
         return getShortestSubstring(s, characters).length();
     }
 
     /**
-     * Static method to solve the given problem.</br>
-     * It is based on a sliding window of variable size and a targetCoverage constraint.</br>
-     * Complexity is O(2n) in the worst case. </br>
+     * Static method to solve the given problem and obtain the shortest
+     * substring.</br> It is based on a sliding window of variable size and a
+     * targetCoverage constraint.</br> Complexity is O(2n) in the worst case.
+     * </br>
      * 
-     * @param s the string to analyse
-     * @param characters the sequence of characters
+     * @param s
+     *            the string to analyse
+     * @param characters
+     *            the sequence of characters
      * @return the shorter substring if exists, an empty string otherwise
      */
     public static String getShortestSubstring(String s, Character... characters) {
@@ -62,10 +75,12 @@ public class ShortestSubstring {
         // Initialize counter for target coverage constraint
         int targetCoverage = 0;
         // Data structures to hold the target and current state
-        // The current state represent the number of occurrencies of each target character in the current window
+        // The current state represent the number of occurrencies of each target
+        // character in the current window
         Multiset<Character> target = HashMultiset.create();
         Multiset<Character> state = HashMultiset.create();
-        // Initialization of the target multiset, adding each character to the target multiset
+        // Initialization of the target multiset, adding each character to the
+        // target multiset
         // this will hold a pair <Character, num_of_occurrencies>
         for (Character c : characters) {
             target.add(c);
@@ -77,28 +92,31 @@ public class ShortestSubstring {
         // Initialization of temporary variables
         Character currentChar = null;
         Character beginChar = null;
-        // Execution of the algorithm, start iterating a pointer through the input string
+        // Execution of the algorithm, start iterating a pointer through the
+        // input string
         for (; end < inputLength; end++) {
             currentChar = s.charAt(end);
             // If the current character is in the target...
             if (target.contains(currentChar)) {
                 // ...add it to the current state...
                 state.add(currentChar);
-                // ...increase the target coverage counter if the char is contributing to cover the target
+                // ...increase the target coverage counter if the char is
+                // contributing to cover the target
                 if (state.count(currentChar) <= target.count(currentChar)) {
                     targetCoverage++;
                 }
                 // if a solution is find (full coverage of the target)
                 if (targetCoverage == numCharacters) {
                     beginChar = s.charAt(begin);
-                    // try to shrink the window from the beginning without breaking the 100% target coverage constraint
+                    // try to shrink the window from the beginning without
+                    // breaking the 100% target coverage constraint
                     while (!target.contains(beginChar) || state.count(beginChar) > target.count(beginChar)) {
                         if (state.count(beginChar) > target.count(beginChar)) {
                             state.remove(beginChar);
                         }
                         beginChar = s.charAt(++begin);
                     }
-                    
+
                     // Analyse the solution and compare it with the current one
                     int newLength = end - begin + 1;
                     // if shorter, this will become our new solution
@@ -110,8 +128,9 @@ public class ShortestSubstring {
                 }
             }
         }
-        
-        // If we have found a solution, return it, otherwise return empty string.
+
+        // If we have found a solution, return it, otherwise return empty
+        // string.
         if (targetCoverage == numCharacters) {
             return s.substring(substringStart, substringEnd + 1);
         } else {
